@@ -128,7 +128,7 @@ class GroundOverlay implements MapsObject<GroundOverlay> {
     }
 
     addIfPresent('groundOverlayId', groundOverlayId.value);
-    addIfPresent('position', position);
+    addIfPresent('position', position.toJson());
     addIfPresent('imageByte', imageByte);
     addIfPresent('bearing', bearing);
     addIfPresent('consumeTapEvents', consumeTapEvents);

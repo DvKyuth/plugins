@@ -9,6 +9,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'page.dart';
@@ -40,8 +41,31 @@ class PlaceMarkerBodyState extends State<PlaceMarkerBody> {
   MarkerId? selectedMarker;
   int _markerIdCounter = 1;
 
+  List<GroundOverlay> lstGroundOverlay = [];
+
+  @override
+  void initState() {
+    placeMapOverlay();
+    super.initState();
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     this.controller = controller;
+  }
+
+  placeMapOverlay() async {
+    final bytes = (await rootBundle.load('assets/red_square.png')).buffer.asUint8List();
+    final data = GroundOverlay(
+      groundOverlayId: GroundOverlayId("1234"),
+      position: LatLngBounds(
+        southwest: LatLng(-33.863, 151.222),
+        northeast: LatLng(-33.852, 151.211),
+      ),
+      imageByte: bytes,
+    );
+    setState(() {
+      lstGroundOverlay.add(data);
+    });
   }
 
   @override
@@ -55,8 +79,7 @@ class PlaceMarkerBodyState extends State<PlaceMarkerBody> {
       setState(() {
         final MarkerId? previousMarkerId = selectedMarker;
         if (previousMarkerId != null && markers.containsKey(previousMarkerId)) {
-          final Marker resetOld = markers[previousMarkerId]!
-              .copyWith(iconParam: BitmapDescriptor.defaultMarker);
+          final Marker resetOld = markers[previousMarkerId]!.copyWith(iconParam: BitmapDescriptor.defaultMarker);
           markers[previousMarkerId] = resetOld;
         }
         selectedMarker = markerId;
@@ -297,9 +320,10 @@ class PlaceMarkerBodyState extends State<PlaceMarkerBody> {
               onMapCreated: _onMapCreated,
               initialCameraPosition: const CameraPosition(
                 target: LatLng(-33.852, 151.211),
-                zoom: 11.0,
+                zoom: 16.0,
               ),
               markers: Set<Marker>.of(markers.values),
+              groundOverlays: lstGroundOverlay.toSet(),
             ),
           ),
         ),
@@ -318,21 +342,15 @@ class PlaceMarkerBodyState extends State<PlaceMarkerBody> {
                         ),
                         TextButton(
                           child: const Text('remove'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _remove(selectedId),
+                          onPressed: selectedId == null ? null : () => _remove(selectedId),
                         ),
                         TextButton(
                           child: const Text('change info'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeInfo(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeInfo(selectedId),
                         ),
                         TextButton(
                           child: const Text('change info anchor'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeInfoAnchor(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeInfoAnchor(selectedId),
                         ),
                       ],
                     ),
@@ -340,51 +358,35 @@ class PlaceMarkerBodyState extends State<PlaceMarkerBody> {
                       children: <Widget>[
                         TextButton(
                           child: const Text('change alpha'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeAlpha(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeAlpha(selectedId),
                         ),
                         TextButton(
                           child: const Text('change anchor'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeAnchor(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeAnchor(selectedId),
                         ),
                         TextButton(
                           child: const Text('toggle draggable'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _toggleDraggable(selectedId),
+                          onPressed: selectedId == null ? null : () => _toggleDraggable(selectedId),
                         ),
                         TextButton(
                           child: const Text('toggle flat'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _toggleFlat(selectedId),
+                          onPressed: selectedId == null ? null : () => _toggleFlat(selectedId),
                         ),
                         TextButton(
                           child: const Text('change position'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changePosition(selectedId),
+                          onPressed: selectedId == null ? null : () => _changePosition(selectedId),
                         ),
                         TextButton(
                           child: const Text('change rotation'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeRotation(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeRotation(selectedId),
                         ),
                         TextButton(
                           child: const Text('toggle visible'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _toggleVisible(selectedId),
+                          onPressed: selectedId == null ? null : () => _toggleVisible(selectedId),
                         ),
                         TextButton(
                           child: const Text('change zIndex'),
-                          onPressed: selectedId == null
-                              ? null
-                              : () => _changeZIndex(selectedId),
+                          onPressed: selectedId == null ? null : () => _changeZIndex(selectedId),
                         ),
                         // A breaking change to the ImageStreamListener API affects this sample.
                         // I've updates the sample to use the new API, but as we cannot use the new
