@@ -4,6 +4,7 @@
 
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 import 'package:google_maps_flutter_platform_interface/src/method_channel/method_channel_google_maps_flutter.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/ground_overlay.dart';
 
 /// Generic Event coming from the native side of Maps.
 ///
@@ -108,8 +109,7 @@ class MarkerDragEndEvent extends _PositionedMapEvent<MarkerId> {
   ///
   /// The `position` on this event is the [LatLng] on which the Marker was dropped.
   /// The `value` of this event is a [MarkerId] object that represents the moved Marker.
-  MarkerDragEndEvent(int mapId, LatLng position, MarkerId markerId)
-      : super(mapId, position, markerId);
+  MarkerDragEndEvent(int mapId, LatLng position, MarkerId markerId) : super(mapId, position, markerId);
 }
 
 /// An event fired when a [Polyline] is tapped.
@@ -134,6 +134,14 @@ class CircleTapEvent extends MapEvent<CircleId> {
   ///
   /// The `value` of this event is a [CircleId] object that represents the tapped Circle.
   CircleTapEvent(int mapId, CircleId circleId) : super(mapId, circleId);
+}
+
+/// An event fired when a [GroundOverlay] is tapped.
+class GroundOverlayTapEvent extends MapEvent<GroundOverlayId> {
+  /// Build an CircleTap Event triggered from the map represented by `mapId`.
+  ///
+  /// The `value` of this event is a [GroundOverlayId] object that represents the tapped Circle.
+  GroundOverlayTapEvent(int mapId, GroundOverlayId groundOverlayId) : super(mapId, groundOverlayId);
 }
 
 /// An event fired when a Map is tapped.
