@@ -202,6 +202,15 @@ class Convert {
     return data;
   }
 
+  static Object groundOverlayIdToJson(String groundOverlayId) {
+    if (groundOverlayId == null) {
+      return null;
+    }
+    final Map<String, Object> data = new HashMap<>(1);
+    data.put("groundOverlayId", groundOverlayId);
+    return data;
+  }
+
   static Map<String, Object> tileOverlayArgumentsToJson(
       String tileOverlayId, int x, int y, int zoom) {
 
@@ -584,12 +593,62 @@ class Convert {
     if (radius != null) {
       sink.setRadius(toDouble(radius));
     }
+
     final String circleId = (String) data.get("circleId");
     if (circleId == null) {
       throw new IllegalArgumentException("circleId was null");
     } else {
       return circleId;
     }
+  }
+
+  static String interpretGroundOverlayOptions(Object o,
+                                              GroundOverlayOptionsSink sink){
+
+    final Map<?,?> data = toMap(o);
+
+    final Object position = data.get("position");
+    if(position != null){
+      sink.setPosition(toLatLngBounds(data.get(0)));
+    }
+
+    final Object consumeTapEvents = data.get("consumeTapEvents");
+    if (consumeTapEvents != null) {
+      sink.setConsumeTapEvents(toBoolean(consumeTapEvents));
+    }
+
+    final Object imageByte = data.get("imageByte");
+    if(imageByte != null){
+      sink.setOverlayImage(toBitmapDescriptor(imageByte));
+    }
+
+    final Object bearing = data.get("bearing");
+    if(bearing != null){
+      sink.setBearing(toFloat(bearing));
+    }
+
+    final Object transparency = data.get("transparency");
+    if(transparency != null){
+      sink.setTransparency(toFloat(transparency));
+    }
+
+    final Object visibility = data.get("visibility");
+    if(visibility != null) {
+      sink.setVisibility(toBoolean(visibility));
+    }
+
+    final Object zIndex = data.get("zIndex");
+    if(zIndex != null){
+      sink.setZIndex(toFloat(zIndex));
+    }
+
+    final String groundOverlayId = (String) data.get("groundOverlayId");
+    if (groundOverlayId == null) {
+      throw new IllegalArgumentException("groundOverlayId was null");
+    } else {
+      return groundOverlayId;
+    }
+
   }
 
   private static List<LatLng> toPoints(Object o) {

@@ -81,8 +81,7 @@ class TestGoogleMapsFlutterPlatform extends GoogleMapsFlutterPlatform {
   bool disposed = false;
 
   // Stream controller to inject events for testing.
-  final StreamController<MapEvent> mapEventStreamController =
-      StreamController<MapEvent>.broadcast();
+  final StreamController<MapEvent> mapEventStreamController = StreamController<MapEvent>.broadcast();
 
   @override
   Future<void> init(int mapId) async {}
@@ -273,9 +272,9 @@ class TestGoogleMapsFlutterPlatform extends GoogleMapsFlutterPlatform {
     Set<Polygon> polygons = const <Polygon>{},
     Set<Polyline> polylines = const <Polyline>{},
     Set<Circle> circles = const <Circle>{},
+    Set<GroundOverlay> groundOverlays = const <GroundOverlay>{},
     Set<TileOverlay> tileOverlays = const <TileOverlay>{},
-    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers =
-        const <Factory<OneSequenceGestureRecognizer>>{},
+    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
     Map<String, dynamic> mapOptions = const <String, dynamic>{},
   }) {
     onPlatformViewCreated(0);

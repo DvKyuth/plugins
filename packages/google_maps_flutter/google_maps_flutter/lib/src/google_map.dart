@@ -71,8 +71,9 @@ class GoogleMap extends StatefulWidget {
     this.polygons = const <Polygon>{},
     this.polylines = const <Polyline>{},
     this.circles = const <Circle>{},
-    this.onCameraMoveStarted,
+    this.groundOverlays = const <GroundOverlay>{},
     this.tileOverlays = const <TileOverlay>{},
+    this.onCameraMoveStarted,
     this.onCameraMove,
     this.onCameraIdle,
     this.onTap,
@@ -142,6 +143,9 @@ class GoogleMap extends StatefulWidget {
 
   /// Circles to be placed on the map.
   final Set<Circle> circles;
+
+  /// Ground overlay to be placed on the map
+  final Set<GroundOverlay> groundOverlays;
 
   /// Tile overlays to be placed on the map.
   final Set<TileOverlay> tileOverlays;
@@ -239,13 +243,13 @@ class GoogleMap extends StatefulWidget {
 class _GoogleMapState extends State<GoogleMap> {
   final _mapId = _nextMapCreationId++;
 
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   Map<MarkerId, Marker> _markers = <MarkerId, Marker>{};
   Map<PolygonId, Polygon> _polygons = <PolygonId, Polygon>{};
   Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
   Map<CircleId, Circle> _circles = <CircleId, Circle>{};
+  Map<GroundOverlayId, GroundOverlay> _groundOverlays = <GroundOverlayId, GroundOverlay>{};
   late _GoogleMapOptions _googleMapOptions;
 
   @override
@@ -271,6 +275,7 @@ class _GoogleMapState extends State<GoogleMap> {
     _polygons = keyByPolygonId(widget.polygons);
     _polylines = keyByPolylineId(widget.polylines);
     _circles = keyByCircleId(widget.circles);
+    _groundOverlays = keyByGroundOverlayId(widget.groundOverlays);
   }
 
   @override
@@ -288,13 +293,13 @@ class _GoogleMapState extends State<GoogleMap> {
     _updatePolygons();
     _updatePolylines();
     _updateCircles();
+    _updateGroundOverlays();
     _updateTileOverlays();
   }
 
   void _updateOptions() async {
     final _GoogleMapOptions newOptions = _GoogleMapOptions.fromWidget(widget);
-    final Map<String, dynamic> updates =
-        _googleMapOptions.updatesMap(newOptions);
+    final Map<String, dynamic> updates = _googleMapOptions.updatesMap(newOptions);
     if (updates.isEmpty) {
       return;
     }
@@ -307,33 +312,36 @@ class _GoogleMapState extends State<GoogleMap> {
   void _updateMarkers() async {
     final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updateMarkers(
-        MarkerUpdates.from(_markers.values.toSet(), widget.markers));
+    controller._updateMarkers(MarkerUpdates.from(_markers.values.toSet(), widget.markers));
     _markers = keyByMarkerId(widget.markers);
   }
 
   void _updatePolygons() async {
     final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updatePolygons(
-        PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
+    controller._updatePolygons(PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
     _polygons = keyByPolygonId(widget.polygons);
   }
 
   void _updatePolylines() async {
     final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updatePolylines(
-        PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+    controller._updatePolylines(PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
     _polylines = keyByPolylineId(widget.polylines);
   }
 
   void _updateCircles() async {
     final GoogleMapController controller = await _controller.future;
     // ignore: unawaited_futures
-    controller._updateCircles(
-        CircleUpdates.from(_circles.values.toSet(), widget.circles));
+    controller._updateCircles(CircleUpdates.from(_circles.values.toSet(), widget.circles));
     _circles = keyByCircleId(widget.circles);
+  }
+
+  void _updateGroundOverlays() async {
+    final GoogleMapController controller = await _controller.future;
+    // ignore: unawaited_futures
+    controller._updateGroundOverlays(GroundOverlayUpdates.from(_groundOverlays.values.toSet(), widget.groundOverlays));
+    _groundOverlays = keyByGroundOverlayId(widget.groundOverlays);
   }
 
   void _updateTileOverlays() async {
@@ -411,6 +419,18 @@ class _GoogleMapState extends State<GoogleMap> {
       throw UnknownMapObjectIdError('marker', circleId, 'onTap');
     }
     final VoidCallback? onTap = circle.onTap;
+    if (onTap != null) {
+      onTap();
+    }
+  }
+
+  void onGroundOverlayTap(GroundOverlayId groundOverlayId) {
+    assert(groundOverlayId != null);
+    final GroundOverlay? groundOverlay = _groundOverlays[groundOverlayId];
+    if (groundOverlay == null) {
+      throw UnknownMapObjectIdError('groundOverlay', groundOverlayId, 'onTap');
+    }
+    final VoidCallback? onTap = groundOverlay.onTap;
     if (onTap != null) {
       onTap();
     }
@@ -535,8 +555,6 @@ class _GoogleMapOptions {
   Map<String, dynamic> updatesMap(_GoogleMapOptions newOptions) {
     final Map<String, dynamic> prevOptionsMap = toMap();
 
-    return newOptions.toMap()
-      ..removeWhere(
-          (String key, dynamic value) => prevOptionsMap[key] == value);
+    return newOptions.toMap()..removeWhere((String key, dynamic value) => prevOptionsMap[key] == value);
   }
 }
